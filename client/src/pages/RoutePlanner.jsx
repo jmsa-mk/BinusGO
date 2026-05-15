@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
-import { MapPin, Crosshair, Search, X, Map as MapIcon } from 'lucide-react';
+import { MapPin, Crosshair, Search, Map as MapIcon } from 'lucide-react';
 import CampusDropdown from '../components/CampusDropdown.jsx';
 import RouteCard from '../components/RouteCard.jsx';
 import BinusMap from '../components/map/BinusMap.jsx';
+import MapBottomSheet from '../components/MapBottomSheet.jsx';
 import { api } from '../api/binusgo.js';
 
 const SORTS = ['Tercepat', 'Termurah', 'Transit ↓', 'Jalan ↓'];
@@ -43,6 +44,11 @@ export default function RoutePlanner() {
     );
   }
 
+  function handleOriginChange(coord) {
+    setOriginCoord(coord);
+    setOrigin(`${coord.lat.toFixed(5)}, ${coord.lng.toFixed(5)}`);
+  }
+
   const sorted = useMemo(() => {
     const arr = [...results];
     if (sort === 'Tercepat') arr.sort((a, b) => a.durationMin - b.durationMin);
@@ -51,6 +57,18 @@ export default function RoutePlanner() {
     else if (sort === 'Jalan ↓') arr.sort((a, b) => b.steps.filter((s) => s.type === 'walk').length - a.steps.filter((s) => s.type === 'walk').length);
     return arr;
   }, [results, sort]);
+
+  const mapNode = (
+    <BinusMap
+      campuses={campuses}
+      allRoutes={sorted}
+      hoveredRoute={hovered}
+      selectedRoute={sorted[0]}
+      origin={originCoord}
+      onOriginChange={handleOriginChange}
+      onSelectCampus={(c) => { setCampusId(c._id); setMobileMap(false); }}
+    />
+  );
 
   return (
     <div className="h-screen flex flex-col md:flex-row">
@@ -73,6 +91,11 @@ export default function RoutePlanner() {
               <Crosshair size={14} />
             </button>
           </div>
+          {originCoord && (
+            <div className="text-[11px] text-white/70 -mt-1">
+              Tip: drag pin merah atau gunakan tombol <Crosshair size={10} className="inline" /> di peta untuk pindahkan asal.
+            </div>
+          )}
 
           <div className="text-textmain">
             <CampusDropdown campuses={campuses} value={campusId} onChange={setCampusId} />
@@ -125,40 +148,18 @@ export default function RoutePlanner() {
         </div>
       </section>
 
-      {/* Right map panel */}
-      <section className="hidden md:block flex-1 relative">
-        <BinusMap
-          campuses={campuses}
-          hoveredRoute={hovered}
-          selectedRoute={sorted[0]}
-          origin={originCoord}
-          onSelectCampus={(c) => setCampusId(c._id)}
-        />
-      </section>
+      {/* Right map panel (desktop) */}
+      <section className="hidden md:block flex-1 relative">{mapNode}</section>
 
-      {/* Mobile map FAB + overlay */}
+      {/* Mobile map FAB + bottom sheet */}
       <button
         onClick={() => setMobileMap(true)}
         className="md:hidden fixed bottom-5 right-5 z-40 px-4 py-3 bg-primary text-white rounded-full shadow-lg flex items-center gap-2 font-semibold">
         <MapIcon size={18} /> Lihat Peta
       </button>
-      {mobileMap && (
-        <div className="md:hidden fixed inset-0 z-50 bg-white flex flex-col">
-          <div className="flex items-center justify-between p-3 border-b">
-            <div className="font-bold">Peta Rute</div>
-            <button onClick={() => setMobileMap(false)} className="p-1"><X /></button>
-          </div>
-          <div className="flex-1">
-            <BinusMap
-              campuses={campuses}
-              hoveredRoute={hovered}
-              selectedRoute={sorted[0]}
-              origin={originCoord}
-              onSelectCampus={(c) => { setCampusId(c._id); setMobileMap(false); }}
-            />
-          </div>
-        </div>
-      )}
+      <MapBottomSheet open={mobileMap} onClose={() => setMobileMap(false)}>
+        {mapNode}
+      </MapBottomSheet>
     </div>
   );
 }

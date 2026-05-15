@@ -9,21 +9,23 @@ const MODE_COLORS = {
   bus: '#F97316',
 };
 
-export default function RoutePolyline({ waypoints = [], highlighted }) {
+export default function RoutePolyline({ waypoints = [], highlighted, faded }) {
   if (waypoints.length < 2) return null;
   const segments = [];
   for (let i = 0; i < waypoints.length - 1; i++) {
     const a = waypoints[i];
     const b = waypoints[i + 1];
     const mode = b.transitMode || 'walk';
+    const weight = faded ? 3 : highlighted ? 7 : 5;
+    const opacity = faded ? 0.35 : highlighted ? 1 : 0.85;
     segments.push(
       <Polyline
         key={i}
         positions={[[a.lat, a.lng], [b.lat, b.lng]]}
         pathOptions={{
           color: MODE_COLORS[mode] || '#5B5FEF',
-          weight: highlighted ? 7 : 5,
-          opacity: highlighted ? 1 : 0.85,
+          weight,
+          opacity,
           dashArray: mode === 'walk' ? '6 8' : undefined,
           lineCap: 'round',
         }}
