@@ -16,6 +16,8 @@ export default function RoutePlanner() {
   const [campusId, setCampusId] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [searched, setSearched] = useState(false);
+  const [errMsg, setErrMsg] = useState('');
   const [hovered, setHovered] = useState(null);
   const [sort, setSort] = useState('Tercepat');
   const [mode, setMode] = useState('Semua');
@@ -24,12 +26,18 @@ export default function RoutePlanner() {
   useEffect(() => { api.campuses().then(setCampuses).catch(() => {}); }, []);
 
   async function search() {
-    if (!campusId) return;
+    if (!campusId) { setErrMsg('Pilih kampus tujuan dulu.'); return; }
     setLoading(true);
+    setErrMsg('');
+    setSearched(true);
     try {
       const apiMode = mode === 'Bus' ? 'TransJakarta' : mode;
       const r = await api.searchRoutes({ origin, campusId, mode: apiMode });
       setResults(r);
+    } catch (e) {
+      console.error('searchRoutes failed:', e);
+      setErrMsg(e.message || 'Gagal mengambil rute. Pastikan server backend berjalan.');
+      setResults([]);
     } finally { setLoading(false); }
   }
 
@@ -127,12 +135,21 @@ export default function RoutePlanner() {
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-thin">
+          {errMsg && (
+            <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl p-3">
+              {errMsg}
+            </div>
+          )}
           {loading && [1,2,3].map((i) => (
             <div key={i} className="bg-white rounded-2xl p-4 animate-pulse h-32" />
           ))}
-          {!loading && sorted.length === 0 && (
+          {!loading && sorted.length === 0 && !errMsg && (
             <div className="text-center text-textmuted py-10 text-sm">
-              {campusId ? 'Tekan "Cari Rute" untuk melihat hasil.' : 'Pilih kampus tujuan untuk mulai mencari rute.'}
+              {searched
+                ? <>Tidak ada rute ditemukan ke kampus ini dengan mode <b>{mode}</b>.<br/>Coba pilih mode <b>Semua</b> atau kampus lain.</>
+                : campusId
+                  ? 'Tekan "Cari Rute" untuk melihat hasil.'
+                  : 'Pilih kampus tujuan untuk mulai mencari rute.'}
             </div>
           )}
           {!loading && sorted.map((r, i) => (
