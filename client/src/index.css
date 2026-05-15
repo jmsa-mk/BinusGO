@@ -1,0 +1,53 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Inter', system-ui, sans-serif;
+  color: #0F172A;
+}
+
+body {
+  margin: 0;
+  background: #F8F9FF;
+}
+
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  z-index: 0;
+}
+
+/* Origin marker pulse */
+.pulse-pin {
+  width: 18px;
+  height: 18px;
+  background: #ef4444;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  animation: pulse 1.6s infinite;
+}
+@keyframes pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+  70%  { box-shadow: 0 0 0 16px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+/* Hide leaflet default marker shadow when using custom */
+.leaflet-marker-icon.custom-div-icon { background: transparent; border: none; }
+
+.hero-bg {
+  background:
+    linear-gradient(rgba(30,27,75,0.85), rgba(30,27,75,0.95)),
+    url('https://images.unsplash.com/photo-1555899434-94d1c7e5b3f7?auto=format&fit=crop&w=1600&q=70') center/cover;
+}
+
+.skyline-bg {
+  background:
+    linear-gradient(rgba(30,27,75,0.88), rgba(30,27,75,0.96)),
+    url('https://images.unsplash.com/photo-1555899434-94d1c7e5b3f7?auto=format&fit=crop&w=1200&q=70') center/cover;
+}
+
+.scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+.scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
