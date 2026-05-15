@@ -49,6 +49,36 @@ export const api = {
 
   // admin
   adminStats: () => request('/admin/stats', { auth: true }),
+  adminUsers: () => request('/admin/users', { auth: true }),
+  adminUpdateUser: (id, b) => request(`/admin/users/${id}`, { method: 'PATCH', body: b, auth: true }),
+  adminDeleteUser: (id) => request(`/admin/users/${id}`, { method: 'DELETE', auth: true }),
+
+  // campus CRUD
+  campusCreate: (b) => request('/campuses', { method: 'POST', body: b, auth: true }),
+  campusUpdate: (id, b) => request(`/campuses/${id}`, { method: 'PUT', body: b, auth: true }),
+  campusDelete: (id) => request(`/campuses/${id}`, { method: 'DELETE', auth: true }),
+
+  // route CRUD
+  routeCreate: (b) => request('/routes', { method: 'POST', body: b, auth: true }),
+  routeUpdate: (id, b) => request(`/routes/${id}`, { method: 'PUT', body: b, auth: true }),
+  routeDelete: (id) => request(`/routes/${id}`, { method: 'DELETE', auth: true }),
+
+  // reports
+  adminReports: (from, to) => {
+    const q = new URLSearchParams({ ...(from ? { from } : {}), ...(to ? { to } : {}) }).toString();
+    return request(`/admin/reports${q ? '?' + q : ''}`, { auth: true });
+  },
+
+  // activity logs
+  adminLogs: (params = {}) => {
+    const q = new URLSearchParams(params).toString();
+    return request(`/admin/logs${q ? '?' + q : ''}`, { auth: true });
+  },
+  adminLogActions: () => request('/admin/logs/actions', { auth: true }),
+
+  // settings
+  adminSettings: () => request('/admin/settings', { auth: true }),
+  adminSettingsUpdate: (b) => request('/admin/settings', { method: 'PUT', body: b, auth: true }),
 };
 
 export const setToken = (t) => {

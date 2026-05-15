@@ -2,6 +2,7 @@ import { Router } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import ActivityLog from '../models/ActivityLog.js';
 import { authRequired } from '../middleware/auth.js';
 
 const router = Router();
@@ -36,6 +37,7 @@ router.post('/register', async (req, res) => {
     });
     const token = signToken(user);
     setAuthCookie(res, token);
+    ActivityLog.create({ user: user._id, userName: user.name, userRole: user.role, action: 'REGISTER', detail: `New ${user.role}: ${user.email}`, ip: req.ip }).catch(() => {});
     res.json({
       token,
       user: { id: user._id, name: user.name, email: user.email, role: user.role, nim: user.nim }
@@ -52,6 +54,7 @@ router.post('/login', async (req, res) => {
     if (!ok) return res.status(401).json({ error: 'Email atau password salah' });
     const token = signToken(user);
     setAuthCookie(res, token);
+    ActivityLog.create({ user: user._id, userName: user.name, userRole: user.role, action: 'LOGIN', detail: user.email, ip: req.ip }).catch(() => {});
     res.json({
       token,
       user: { id: user._id, name: user.name, email: user.email, role: user.role, nim: user.nim }
