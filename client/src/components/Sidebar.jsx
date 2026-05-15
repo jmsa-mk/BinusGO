@@ -13,8 +13,8 @@ export default function Sidebar() {
 
   return (
     <aside className="hidden md:flex fixed top-0 left-0 h-screen w-20 bg-white border-r border-slate-200 flex-col items-center py-4 z-30">
-      <Link to="/" className="mb-6 w-12 h-12 rounded-xl bg-primary text-white flex items-center justify-center font-heading font-extrabold">
-        B!
+      <Link to="/" className="mb-6 w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center bg-white">
+        <img src="/logo.jpg" alt="BinusGO!" className="w-full h-full object-contain" />
       </Link>
 
       <nav className="flex flex-col gap-2 w-14">

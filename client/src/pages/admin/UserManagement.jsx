@@ -77,7 +77,7 @@ export default function UserManagement() {
               <tr key={u._id} className="border-t border-slate-50 hover:bg-slate-50/50">
                 <td className="px-4 py-3 font-mono text-textmuted">{i + 1}</td>
                 <td className="font-semibold">{u.name} {u._id === me?.id && <span className="text-[10px] text-primary">(you)</span>}</td>
-                <td className="font-mono text-xs">{u.nim || '—'}</td>
+                <td className="font-mono text-xs">{u.nim || '-'}</td>
                 <td>
                   <select value={u.role} onChange={(e) => changeRole(u, e.target.value)}
                     disabled={u._id === me?.id}

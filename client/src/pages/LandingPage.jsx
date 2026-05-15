@@ -13,7 +13,7 @@ export default function LandingPage() {
     <div className="min-h-screen hero-bg text-white flex flex-col">
       <header className="flex items-center justify-between px-6 md:px-12 py-5">
         <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center font-heading font-extrabold">B!</div>
+          <img src="/logo.jpg" alt="BinusGO!" className="w-10 h-10 rounded-xl object-contain bg-white p-1" />
           <div>
             <div className="font-heading font-extrabold text-xl leading-none">BinusGO!</div>
             <div className="text-[10px] uppercase tracking-widest text-white/60">Transit Planner</div>
@@ -32,7 +32,7 @@ export default function LandingPage() {
           Transit Cerdas <span className="text-primary">Menuju Kampus</span>
         </h1>
         <p className="max-w-xl text-white/70 mb-8">
-          Cari rute terbaik ke seluruh kampus BINUS di Jabodetabek — TransJakarta, KRL, LRT, dan Mikrotrans dalam satu aplikasi.
+          Cari rute terbaik ke seluruh kampus BINUS di Jabodetabek - TransJakarta, KRL, LRT, dan Mikrotrans dalam satu aplikasi.
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-8 text-white mb-10">
@@ -66,7 +66,7 @@ export default function LandingPage() {
       </main>
 
       <footer className="text-center text-white/40 text-xs py-6 border-t border-white/10">
-        © {new Date().getFullYear()} BinusGO! — BINUS University. Dibuat untuk Mahasiswa, Dosen, & Staff.
+        © {new Date().getFullYear()} BinusGO! - BINUS University. Dibuat untuk Mahasiswa, Dosen, & Staff.
       </footer>
     </div>
   );

@@ -90,15 +90,15 @@ export default function ActivityLog() {
                 <td className="px-4 py-3 font-mono text-[11px] text-textmuted whitespace-nowrap">
                   {new Date(l.createdAt).toLocaleString('id-ID', { hour12: false })}
                 </td>
-                <td className="font-semibold">{l.userName || '—'}</td>
-                <td className="text-xs">{l.userRole || '—'}</td>
+                <td className="font-semibold">{l.userName || '-'}</td>
+                <td className="text-xs">{l.userRole || '-'}</td>
                 <td>
                   <span className={`text-[10px] font-bold font-mono px-1.5 py-0.5 rounded ${ACTION_COLORS[l.action] || 'bg-slate-100 text-textmuted'}`}>
                     {l.action}
                   </span>
                 </td>
                 <td className="text-textmuted text-xs max-w-[420px] truncate">{l.detail}</td>
-                <td className="font-mono text-[11px] text-textmuted">{l.ip || '—'}</td>
+                <td className="font-mono text-[11px] text-textmuted">{l.ip || '-'}</td>
               </tr>
             ))}
             {logs.length === 0 && <tr><td colSpan="6" className="py-10 text-center text-textmuted">Tidak ada log.</td></tr>}

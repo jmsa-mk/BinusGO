@@ -30,7 +30,7 @@ export default function TripHistory() {
           {items.map((h) => (
             <li key={h._id} className="bg-white rounded-xl p-4 shadow-sm flex items-center gap-3">
               <div className="text-sm font-medium truncate flex-1">
-                {h.origin || '—'} <ArrowRight className="inline" size={14} /> {h.destinationName || h.destinationCampus?.name || '—'}
+                {h.origin || '-'} <ArrowRight className="inline" size={14} /> {h.destinationName || h.destinationCampus?.name || '-'}
               </div>
               <div className="text-xs text-textmuted">
                 {new Date(h.createdAt).toLocaleString('id-ID')}

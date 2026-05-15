@@ -159,7 +159,7 @@ export default function Reports() {
                 {data.topRoutes.map((r, i) => (
                   <tr key={i} className="border-t border-slate-50">
                     <td className="py-2 font-mono">{i + 1}</td>
-                    <td className="truncate max-w-[260px]">{r.destName || '—'}</td>
+                    <td className="truncate max-w-[260px]">{r.destName || '-'}</td>
                     <td className="text-right font-mono font-semibold">{r.count}</td>
                   </tr>
                 ))}
@@ -175,8 +175,8 @@ export default function Reports() {
             <Row k="Periode" v={`${from} s/d ${to}`} />
             <Row k="Total pencarian rute" v={data.summary.totalSearches} />
             <Row k="User baru terdaftar" v={data.summary.totalNewUsers} />
-            <Row k="Mode transit terpopuler" v={data.modeUsage[0]?._id || '—'} />
-            <Row k="Kampus tujuan #1" v={data.topCampuses[0]?._id || '—'} />
+            <Row k="Mode transit terpopuler" v={data.modeUsage[0]?._id || '-'} />
+            <Row k="Kampus tujuan #1" v={data.topCampuses[0]?._id || '-'} />
           </tbody>
         </table>
       </Card>

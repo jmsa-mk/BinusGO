@@ -27,7 +27,7 @@ export default function RegisterPage() {
     <div className="min-h-screen grid md:grid-cols-2">
       <div className="skyline-bg text-white p-10 md:p-14 flex flex-col justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center font-heading font-extrabold">B!</div>
+          <img src="/logo.jpg" alt="BinusGO!" className="w-10 h-10 rounded-xl object-contain bg-white p-1" />
           <div className="font-heading font-extrabold text-xl">BinusGO!</div>
         </Link>
         <div>

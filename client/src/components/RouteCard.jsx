@@ -82,7 +82,7 @@ export default function RouteCard({ route, badge, onHover, onLeave, highlighted 
               {route.steps.map((s, i) => (
                 <li key={i} className="flex gap-2 text-sm">
                   <span className="w-5 h-5 rounded-full bg-primary text-white flex items-center justify-center text-[10px] font-bold flex-shrink-0">{i + 1}</span>
-                  <span><b>{s.type === 'walk' ? 'Jalan kaki' : s.type}</b> {s.durationMin} mnt — {s.stopName}{s.line ? ` (${s.line})` : ''}</span>
+                  <span><b>{s.type === 'walk' ? 'Jalan kaki' : s.type}</b> {s.durationMin} mnt - {s.stopName}{s.line ? ` (${s.line})` : ''}</span>
                 </li>
               ))}
             </ol>
