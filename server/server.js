@@ -8,6 +8,7 @@ import authRoutes from './routes/auth.js';
 import campusRoutes from './routes/campuses.js';
 import routeRoutes from './routes/routes.js';
 import savedRoutes from './routes/saved.js';
+import savedRoutesRoute from './routes/savedRoutes.js';
 import historyRoutes from './routes/history.js';
 import adminRoutes from './routes/admin.js';
 
@@ -27,6 +28,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/campuses', campusRoutes);
 app.use('/api/routes', routeRoutes);
 app.use('/api/saved', savedRoutes);
+app.use('/api/saved-routes', savedRoutesRoute);
 app.use('/api/history', historyRoutes);
 app.use('/api/admin', adminRoutes);
 

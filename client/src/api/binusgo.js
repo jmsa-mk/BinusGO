@@ -39,10 +39,16 @@ export const api = {
   },
   searchRoutes: (b) => request('/routes/search', { method: 'POST', body: b, auth: true }),
 
-  // saved
+  // saved (campuses)
   saved: () => request('/saved', { auth: true }),
   save: (campusId) => request('/saved', { method: 'POST', body: { campusId }, auth: true }),
   unsave: (id) => request(`/saved/${id}`, { method: 'DELETE', auth: true }),
+
+  // saved routes (favorit per-rute)
+  savedRoutes: () => request('/saved-routes', { auth: true }),
+  saveRoute: (routeId) => request('/saved-routes', { method: 'POST', body: { routeId }, auth: true }),
+  unsaveRoute: (routeId) => request(`/saved-routes/by-route/${routeId}`, { method: 'DELETE', auth: true }),
+  unsaveRouteById: (id) => request(`/saved-routes/${id}`, { method: 'DELETE', auth: true }),
 
   // history
   history: () => request('/history', { auth: true }),

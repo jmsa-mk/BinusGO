@@ -35,8 +35,8 @@ export default function RoutePlanner() {
   async function refreshSaved() {
     if (!user) { setSavedIds(new Set()); return; }
     try {
-      const items = await api.saved();
-      setSavedIds(new Set(items.map((x) => x.campus?._id || x.campus)));
+      const items = await api.savedRoutes();
+      setSavedIds(new Set(items.map((x) => x.route?._id || x.route)));
     } catch { setSavedIds(new Set()); }
   }
   useEffect(() => { refreshSaved(); /* eslint-disable-next-line */ }, [user]);

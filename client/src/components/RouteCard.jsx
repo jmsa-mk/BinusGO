@@ -20,23 +20,20 @@ export default function RouteCard({ route, badge, onHover, onLeave, highlighted,
   const dep = fmtTime(0);
   const arr = fmtTime(route.durationMin);
 
-  const campusId = route.destinationCampus?._id || route.destinationCampus;
-  const isSaved = campusId && savedIds.has(campusId);
+  const isSaved = route._id && savedIds.has(route._id);
 
   async function toggleSave(e) {
     e.stopPropagation();
     if (!user) { setToast('Login dulu untuk menyimpan'); setTimeout(() => setToast(''), 2200); return; }
-    if (!campusId) return;
+    if (!route._id) return;
     setBusy(true);
     try {
       if (isSaved) {
-        const savedItem = await api.saved();
-        const it = savedItem.find((x) => (x.campus?._id || x.campus) === campusId);
-        if (it) await api.unsave(it._id);
+        await api.unsaveRoute(route._id);
         setToast('Dihapus dari favorit');
       } else {
-        await api.save(campusId);
-        setToast('✓ Tersimpan ke favorit');
+        await api.saveRoute(route._id);
+        setToast('✓ Rute tersimpan ke favorit');
       }
       onSavedChange?.();
     } catch (e) {
