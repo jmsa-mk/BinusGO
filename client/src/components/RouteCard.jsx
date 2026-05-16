@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, Clock, Wallet, Bookmark, BookmarkCheck, LogIn } from 'lucide-react';
+import { ChevronDown, ChevronUp, Clock, Wallet, Bookmark, BookmarkCheck, LogIn, MapPin } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import TransitStep from './TransitStep.jsx';
 import BinusMap from './map/BinusMap.jsx';
@@ -56,7 +56,11 @@ export default function RouteCard({ route, badge, onHover, onLeave, highlighted,
       }`}
     >
       <div className="flex items-center justify-between mb-2 gap-2">
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
+          <div className="text-[11px] text-textmuted flex items-center gap-1 mb-0.5 truncate">
+            <MapPin size={11} className="text-primary flex-shrink-0" />
+            <span className="truncate">Dari: <b className="text-textmain">{route.origin}</b></span>
+          </div>
           <div className="font-heading font-bold text-lg">{dep} – {arr}</div>
           <div className="text-xs text-textmuted flex items-center gap-1">
             <Clock size={12} /> {Math.floor(route.durationMin / 60)} j {route.durationMin % 60} mnt

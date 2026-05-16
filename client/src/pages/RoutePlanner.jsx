@@ -21,6 +21,7 @@ export default function RoutePlanner() {
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [errMsg, setErrMsg] = useState('');
+  const [fallback, setFallback] = useState(false);
   const [hovered, setHovered] = useState(null);
   const [sort, setSort] = useState('Tercepat');
   const [mode, setMode] = useState('Semua');
@@ -41,11 +42,15 @@ export default function RoutePlanner() {
     if (!campusId) { setErrMsg('Pilih kampus tujuan dulu.'); return; }
     setLoading(true);
     setErrMsg('');
+    setFallback(false);
     setSearched(true);
     try {
       const apiMode = mode === 'Bus' ? 'TransJakarta' : mode;
       const r = await api.searchRoutes({ origin, campusId, mode: apiMode });
-      setResults(r);
+      // Backend now returns { items, fallback } — but also support old array shape for safety
+      const items = Array.isArray(r) ? r : (r.items || []);
+      setResults(items);
+      setFallback(Array.isArray(r) ? false : !!r.fallback);
     } catch (e) {
       console.error('searchRoutes failed:', e);
       setErrMsg(e.message || 'Gagal mengambil rute. Pastikan server backend berjalan.');
@@ -150,6 +155,11 @@ export default function RoutePlanner() {
           {errMsg && (
             <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl p-3">
               {errMsg}
+            </div>
+          )}
+          {fallback && !loading && (
+            <div className="bg-amber-50 border border-amber-200 text-amber-800 text-xs rounded-xl p-3">
+              Tidak ada rute langsung dari <b>{origin}</b>. Menampilkan semua rute ke kampus tujuan sebagai alternatif.
             </div>
           )}
           {loading && [1,2,3].map((i) => (

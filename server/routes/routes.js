@@ -29,7 +29,23 @@ router.post('/search', authOptional, async (req, res) => {
   const q = {};
   if (campusId) q.destinationCampus = campusId;
   if (mode && mode !== 'Semua') q.modes = mode;
-  const items = await Route.find(q).populate('destinationCampus');
+
+  // Filter by origin text (case-insensitive substring), kecuali "Lokasi Saya" atau koordinat
+  const trimmed = (origin || '').trim();
+  const isCoord = /^-?\d+\.\d+\s*,\s*-?\d+\.\d+$/.test(trimmed);
+  if (trimmed && trimmed.toLowerCase() !== 'lokasi saya' && !isCoord) {
+    q.origin = { $regex: trimmed.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), $options: 'i' };
+  }
+
+  let items = await Route.find(q).populate('destinationCampus');
+
+  // Fallback: kalau gak ketemu dengan origin tertentu, kasih semua rute ke kampus itu sebagai saran
+  let fallback = false;
+  if (items.length === 0 && q.origin && campusId) {
+    delete q.origin;
+    items = await Route.find(q).populate('destinationCampus');
+    fallback = items.length > 0;
+  }
 
   Route.updateMany(q, { $inc: { searchCount: 1 } }).catch(() => {});
 
@@ -47,7 +63,7 @@ router.post('/search', authOptional, async (req, res) => {
     logIt(req, 'ROUTE_SEARCH', `${origin || 'Lokasi Saya'} → ${c?.name} [${mode || 'Semua'}]`);
   }
 
-  res.json(items);
+  res.json({ items, fallback });
 });
 
 router.post('/', authRequired, adminOnly, async (req, res) => {
