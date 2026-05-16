@@ -1,18 +1,51 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, Clock, Wallet } from 'lucide-react';
+import { ChevronDown, ChevronUp, Clock, Wallet, Bookmark, BookmarkCheck, LogIn } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import TransitStep from './TransitStep.jsx';
 import BinusMap from './map/BinusMap.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
+import { api } from '../api/binusgo.js';
 
 function fmtTime(addMin = 0) {
   const d = new Date(Date.now() + addMin * 60000);
   return d.toTimeString().slice(0, 5);
 }
 
-export default function RouteCard({ route, badge, onHover, onLeave, highlighted }) {
+export default function RouteCard({ route, badge, onHover, onLeave, highlighted, savedIds = new Set(), onSavedChange }) {
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState('Jadwal');
+  const [busy, setBusy] = useState(false);
+  const [toast, setToast] = useState('');
   const dep = fmtTime(0);
   const arr = fmtTime(route.durationMin);
+
+  const campusId = route.destinationCampus?._id || route.destinationCampus;
+  const isSaved = campusId && savedIds.has(campusId);
+
+  async function toggleSave(e) {
+    e.stopPropagation();
+    if (!user) { setToast('Login dulu untuk menyimpan'); setTimeout(() => setToast(''), 2200); return; }
+    if (!campusId) return;
+    setBusy(true);
+    try {
+      if (isSaved) {
+        const savedItem = await api.saved();
+        const it = savedItem.find((x) => (x.campus?._id || x.campus) === campusId);
+        if (it) await api.unsave(it._id);
+        setToast('Dihapus dari favorit');
+      } else {
+        await api.save(campusId);
+        setToast('✓ Tersimpan ke favorit');
+      }
+      onSavedChange?.();
+    } catch (e) {
+      setToast(e.message || 'Gagal menyimpan');
+    } finally {
+      setBusy(false);
+      setTimeout(() => setToast(''), 2200);
+    }
+  }
 
   return (
     <div
@@ -22,21 +55,42 @@ export default function RouteCard({ route, badge, onHover, onLeave, highlighted 
         highlighted ? 'border-primary shadow-lg' : 'border-transparent shadow-sm hover:shadow-md'
       }`}
     >
-      <div className="flex items-center justify-between mb-2">
-        <div>
+      <div className="flex items-center justify-between mb-2 gap-2">
+        <div className="min-w-0">
           <div className="font-heading font-bold text-lg">{dep} – {arr}</div>
           <div className="text-xs text-textmuted flex items-center gap-1">
             <Clock size={12} /> {Math.floor(route.durationMin / 60)} j {route.durationMin % 60} mnt
           </div>
         </div>
-        {badge && (
-          <span className={`px-2 py-1 rounded-lg text-[10px] font-bold ${
-            badge === 'Tercepat' ? 'bg-accent text-white' : 'bg-success/15 text-success'
-          }`}>
-            {badge}
-          </span>
-        )}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {badge && (
+            <span className={`px-2 py-1 rounded-lg text-[10px] font-bold whitespace-nowrap ${
+              badge === 'Tercepat' ? 'bg-accent text-white' : 'bg-success/15 text-success'
+            }`}>
+              {badge}
+            </span>
+          )}
+          <button
+            onClick={toggleSave}
+            disabled={busy}
+            title={user ? (isSaved ? 'Hapus dari favorit' : 'Simpan ke favorit') : 'Login untuk menyimpan'}
+            className={`p-2 rounded-lg transition flex-shrink-0 ${
+              isSaved ? 'bg-accent/15 text-accent' : 'bg-slate-100 text-textmuted hover:bg-primary/10 hover:text-primary'
+            } disabled:opacity-50`}
+          >
+            {!user ? <LogIn size={16} /> : isSaved ? <BookmarkCheck size={16} /> : <Bookmark size={16} />}
+          </button>
+        </div>
       </div>
+
+      {toast && (
+        <div className="mb-2 text-xs px-2 py-1.5 bg-success/10 text-success rounded-lg flex items-center justify-between">
+          <span>{toast}</span>
+          {!user && toast.includes('Login') && (
+            <Link to="/login" className="font-bold underline">Masuk →</Link>
+          )}
+        </div>
+      )}
 
       <div className="flex flex-wrap items-center gap-1 mb-3">
         {route.steps.map((s, i) => (

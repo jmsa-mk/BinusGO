@@ -5,12 +5,15 @@ import RouteCard from '../components/RouteCard.jsx';
 import BinusMap from '../components/map/BinusMap.jsx';
 import MapBottomSheet from '../components/MapBottomSheet.jsx';
 import { api } from '../api/binusgo.js';
+import { useAuth } from '../context/AuthContext.jsx';
 
 const SORTS = ['Tercepat', 'Termurah', 'Transit ↓', 'Jalan ↓'];
 const MODES = ['Semua', 'Bus', 'KRL', 'LRT', 'Mikrotrans'];
 
 export default function RoutePlanner() {
+  const { user } = useAuth();
   const [campuses, setCampuses] = useState([]);
+  const [savedIds, setSavedIds] = useState(new Set());
   const [origin, setOrigin] = useState('');
   const [originCoord, setOriginCoord] = useState(null);
   const [campusId, setCampusId] = useState('');
@@ -24,6 +27,15 @@ export default function RoutePlanner() {
   const [mobileMap, setMobileMap] = useState(false);
 
   useEffect(() => { api.campuses().then(setCampuses).catch(() => {}); }, []);
+
+  async function refreshSaved() {
+    if (!user) { setSavedIds(new Set()); return; }
+    try {
+      const items = await api.saved();
+      setSavedIds(new Set(items.map((x) => x.campus?._id || x.campus)));
+    } catch { setSavedIds(new Set()); }
+  }
+  useEffect(() => { refreshSaved(); /* eslint-disable-next-line */ }, [user]);
 
   async function search() {
     if (!campusId) { setErrMsg('Pilih kampus tujuan dulu.'); return; }
@@ -160,6 +172,8 @@ export default function RoutePlanner() {
               onHover={() => setHovered(r)}
               onLeave={() => setHovered(null)}
               highlighted={hovered?._id === r._id}
+              savedIds={savedIds}
+              onSavedChange={refreshSaved}
             />
           ))}
         </div>
