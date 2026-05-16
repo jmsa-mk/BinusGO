@@ -10,7 +10,7 @@ export default function CampusManagement() {
   const [items, setItems] = useState([]);
   const [q, setQ] = useState('');
   const [cluster, setCluster] = useState('');
-  const [modal, setModal] = useState(null); // null | 'new' | campus
+  const [modal, setModal] = useState(null);
   const [form, setForm] = useState(EMPTY);
   const [busy, setBusy] = useState(false);
 

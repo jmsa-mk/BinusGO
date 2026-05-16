@@ -47,7 +47,6 @@ export default function RoutePlanner() {
     try {
       const apiMode = mode === 'Bus' ? 'TransJakarta' : mode;
       const r = await api.searchRoutes({ origin, campusId, mode: apiMode });
-      // Backend now returns { items, fallback } — but also support old array shape for safety
       const items = Array.isArray(r) ? r : (r.items || []);
       setResults(items);
       setFallback(Array.isArray(r) ? false : !!r.fallback);
@@ -97,9 +96,8 @@ export default function RoutePlanner() {
 
   return (
     <div className="h-screen flex flex-col md:flex-row">
-      {/* Left panel */}
       <section className="md:w-2/5 flex flex-col bg-lightbg overflow-hidden">
-        <div className="bg-primary text-white p-5 space-y-3">
+        <div className="bg-primary text-white p-5 pr-16 md:pr-5 space-y-3">
           <h1 className="font-heading text-xl font-extrabold">Cari Rute Transit</h1>
 
           <div className="flex items-stretch gap-2">
@@ -189,10 +187,8 @@ export default function RoutePlanner() {
         </div>
       </section>
 
-      {/* Right map panel (desktop) */}
       <section className="hidden md:block flex-1 relative">{mapNode}</section>
 
-      {/* Mobile map FAB + bottom sheet */}
       <button
         onClick={() => setMobileMap(true)}
         className="md:hidden fixed bottom-5 right-5 z-40 px-4 py-3 bg-primary text-white rounded-full shadow-lg flex items-center gap-2 font-semibold">

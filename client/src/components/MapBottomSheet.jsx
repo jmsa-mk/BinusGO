@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 
 export default function MapBottomSheet({ open, onClose, children }) {
   const ref = useRef(null);
-  const [drag, setDrag] = useState(0);       // current drag offset (px)
+  const [drag, setDrag] = useState(0);
   const [dragging, setDragging] = useState(false);
   const startY = useRef(0);
 
