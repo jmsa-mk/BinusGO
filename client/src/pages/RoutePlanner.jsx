@@ -6,6 +6,7 @@ import BinusMap from '../components/map/BinusMap.jsx';
 import MapBottomSheet from '../components/MapBottomSheet.jsx';
 import { api } from '../api/binusgo.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import { findNearestStop, reverseGeocode } from '../data/stops.js';
 
 const SORTS = ['Tercepat', 'Termurah', 'Transit ↓', 'Jalan ↓'];
 const MODES = ['Semua', 'Bus', 'KRL', 'LRT', 'Mikrotrans'];
@@ -23,6 +24,8 @@ export default function RoutePlanner() {
   const [errMsg, setErrMsg] = useState('');
   const [fallback, setFallback] = useState(false);
   const [hovered, setHovered] = useState(null);
+  const [nearestStop, setNearestStop] = useState(null);
+  const [geocoding, setGeocoding] = useState(false);
   const [sort, setSort] = useState('Tercepat');
   const [mode, setMode] = useState('Semua');
   const [mobileMap, setMobileMap] = useState(false);
@@ -46,7 +49,11 @@ export default function RoutePlanner() {
     setSearched(true);
     try {
       const apiMode = mode === 'Bus' ? 'TransJakarta' : mode;
-      const r = await api.searchRoutes({ origin, campusId, mode: apiMode });
+      // Kalau origin user dari koordinat (drag pin / geolocation), pakai nama stasiun terdekat
+      // sebagai filter origin di backend supaya hasil lebih relevan
+      let searchOrigin = origin;
+      if (originCoord && nearestStop?.stop) searchOrigin = nearestStop.stop.name;
+      const r = await api.searchRoutes({ origin: searchOrigin, campusId, mode: apiMode });
       const items = Array.isArray(r) ? r : (r.items || []);
       setResults(items);
       setFallback(Array.isArray(r) ? false : !!r.fallback);
@@ -57,20 +64,29 @@ export default function RoutePlanner() {
     } finally { setLoading(false); }
   }
 
+  async function resolveCoord(coord, fallbackLabel) {
+    setOriginCoord(coord);
+    const nearest = findNearestStop(coord);
+    setNearestStop(nearest);
+    setGeocoding(true);
+    // Tampilkan label sementara dulu, lalu reverse geocode async
+    setOrigin(fallbackLabel || `${coord.lat.toFixed(5)}, ${coord.lng.toFixed(5)}`);
+    try {
+      const placeName = await reverseGeocode(coord.lat, coord.lng);
+      if (placeName) setOrigin(placeName);
+    } finally { setGeocoding(false); }
+  }
+
   function useMyLocation() {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setOriginCoord({ lat: pos.coords.latitude, lng: pos.coords.longitude });
-        setOrigin('Lokasi Saya');
-      },
+      (pos) => resolveCoord({ lat: pos.coords.latitude, lng: pos.coords.longitude }, 'Lokasi Saya'),
       () => alert('Tidak bisa mengakses lokasi'),
     );
   }
 
   function handleOriginChange(coord) {
-    setOriginCoord(coord);
-    setOrigin(`${coord.lat.toFixed(5)}, ${coord.lng.toFixed(5)}`);
+    resolveCoord(coord);
   }
 
   const sorted = useMemo(() => {
@@ -114,9 +130,12 @@ export default function RoutePlanner() {
               <Crosshair size={14} />
             </button>
           </div>
-          {originCoord && (
-            <div className="text-[11px] text-white/70 -mt-1">
-              Tip: drag pin merah atau gunakan tombol <Crosshair size={10} className="inline" /> di peta untuk pindahkan asal.
+          {originCoord && nearestStop?.stop && (
+            <div className="text-[11px] text-white/80 -mt-1 bg-white/10 rounded-lg px-2 py-1.5">
+              {geocoding && <span className="opacity-80">Mencari nama lokasi… </span>}
+              <span>Stasiun terdekat: <b>{nearestStop.stop.name}</b> ({nearestStop.distKm.toFixed(1)} km).</span>
+              <br />
+              <span className="opacity-70">Rute akan dicari dari stasiun terdekat ini. Drag pin merah untuk pindahkan asal.</span>
             </div>
           )}
 
